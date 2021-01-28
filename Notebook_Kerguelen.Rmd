@@ -1,0 +1,379 @@
+---
+title: "Kerguelen MD 206"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+For further analysis and data, please refer to the accompanied github repo:
+
+https://github.com/CoraHoerstmann/Kerguelen2021
+
+
+**Data**:
+
+The datasets can be downloaded from PANGEAE: https://doi.org/10.1594/PANGAEA.885896 (Hoerstmann et al. 2018)
+
+genomic sequencing data: https://www.ebi.ac.uk/ena/browser/view/PRJEB29488 (Study name: MD206_genomics, accession no: PRJEB29488)
+
+References for used **Rpackages**:
+
+! For package version use packageVersion() and see within notebook
+
+tidyverse:        Wickham et al., (2019)              (https://doi.org/10.21105/joss.01686)
+
+ggplot2:          Wickham (2016)                      (https://ggplot2.tidyverse.org)
+
+vegan:            Oksanen et al. 2019                 (https://CRAN.R-project.org/package=vegan)
+
+zCompositions:    Palarea-Albaladejo et al. (2015)    (http://dx.doi.org/10.1016/j.chemolab.2015.02.019)
+
+iNEXT:            Hsieh et al. (2020)                 (http://chao.stat.nthu.edu.tw/wordpress/software-download/)
+
+geodist:          Padgham & Sumner (2019)             (https://CRAN.R-project.org/package=geodist)
+
+reshape2:         Wickham (2007)                      (http://www.jstatsoft.org/v21/i12/)
+
+ape:              Paradis & Schliep (2018) 
+
+gdm:              Fitzpatrick et al. (2020)           (//CRAN.R-project.org/package=gdm)
+
+upsetR:           Gehlenborg (2019)                   (https://CRAN.R-project.org/package=UpSetR)
+
+phyloseq:         McMurdie & Holmes (2013)            (http://dx.plos.org/10.1371/journal.pone.0061217)
+
+magrittr:         Bache & Wickham (2014)              (https://CRAN.R-project.org/package=magrittr)
+
+
+
+Acknowledgement for decisions for **statistical analyses**:
+
+Buttigieg PL, Ramette A (2014) A Guide to Statistical Analysis in Microbial Ecology: 
+a community-focused, living review of multivariate data analyses. FEMS Microbiol Ecol. 90: 543–550.
+https://mb3is.megx.net/gustame/home
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## **Productivity analysis**
+
+this is kept seperate from microbial analysis because in microbial analysis we only use the mean vaules of the rates.
+In this part of the analysis we plot the biological rates against environmental data (temperature) and check for significance between ocean provinces and watermasses.
+
+
+
+### **import datasets**
+
+import, rename the columnheaders and associate provincecs and watermasses
+
+```{r import, echo=FALSE}
+source("D:/Kerguelen_project/analysis_with_R/Rscripts/metadata_import.R", encoding = "UTF-8")
+```
+### **Nutrient plots**
+
+Dissolved inorganic nutrients (nitrate, phsophate and silicate) and particulate organic carbon to particulate organic nitrogen ratio are plotted against sea surface temperature. Temperature is the best predictor of watermasses and strongest correlate with environmental data and was thus used in our dataset for data representation. Samples are colored according to water mass (WM)
+
+We performed two sample t-test to check for significant differences between ocean provinces.
+
+```{r nutrients, echo=FALSE, warning = FALSE, fig.width=7,fig.height=3.5, fig.show="hold", out.width="50%"}
+source("D:/Kerguelen_project/analysis_with_R/Rscripts/nutrient_plots.R",encoding = "UTF-8")
+Nutrient_p(Carbonfix, POCPN)
+```
+
+
+### **Rate measurements**
+
+#### calculate specific PP and specific N2 fix
+
+To calculate biomass specific primary productivity (PB) and chlorophyll-specific N2 fixation we normalized the rate measurements by chlorophyll concentration. 
+
+PB is mainly a function of irradiance but can also sometimes be used to check phtoplankton efficiency
+
+N2 fixation, normalized by chlorophyll a, gives insights about the relative importance of N2 fixation to primary productivity. As seen in our data, although we were able to measure N2 fixation throughout the entire sampling region, the relative importance of N2 fixation to PP in the Southern Ocean (SO) is low because other N sources (nitrate) are available and PP is >> N2 fixation.
+
+```{r phytoplankton biomass normalization, echo=TRUE}
+
+Carbonfix$PB <- Carbonfix$cfix.day/Carbonfix$chl.a_ug.l
+
+```
+
+#### plot rates against sea surface temperature 
+
+We plotted rate measurements and specific rate measurements against sea surface temperature and colored the samples according to water masses (WM).
+(Fig. 3 and Fig. A10)
+
+```{r rates, echo=FALSE, warning=FALSE, fig.width=7,fig.height=3.5, fig.show="hold", out.width="50%"}
+source("D:/Kerguelen_project/analysis_with_R/Rscripts/C_N2_Fixationrates_plots_noStats.R",encoding = "UTF-8")
+PPplot(Carbonfix)
+N2plot(N2fix)
+```
+
+PN and delta 15N ratios (Fig. A4)
+```{r PNanddN, echo=FALSE, warning = FALSE, fig.width=7,fig.height=3.5, fig.show="hold", out.width="50%"}
+source("D:/Kerguelen_project/analysis_with_R/Rscripts/PNChla_delta15N.R",encoding = "UTF-8")
+supPN(POCPN, N2fix)
+```
+### **import microbial datasets files and data prep**
+
+metdata calculates mean for carbon fixation and N2 fixation for using it as metadata for microbial analyses.
+```{r genomics, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+source("D:/Kerguelen_project/analysis_with_R/Rscripts/metadata4genomics.R")
+source("D:/Kerguelen_project/analysis_with_R/Rscripts/import_16S.R")
+source("D:/Kerguelen_project/analysis_with_R/Rscripts/import_18S.R")
+```
+
+
+### **Pigment analyses**
+
+We used High throughput pigment liquid chromatography (HPLC) to identify different pigments in our samples. Pigments can be used as markers for phytoplankton taxa and size classes and were calculated after Hirata et al. 2011 and Uitz et al. 2006.
+How to calculate the diagnostic pigments see supplementary table 4 
+
+We tested significance of pigment composition between ocean provinces with PERMANOVA and checked for individual pigments using Welch two-sample t-test.
+
+Size classes had a significant second order polynominal fit.
+
+(Fig. A5)
+
+```{r pigm, fig.width=7,fig.height=3.5, echo=FALSE, warning=FALSE}
+diag_pigm <- read.csv("D:/Kerguelen_project/analysis_with_R/Rscripts/Submission_analysis/diag_pigm_mg_m3_t0_nosize.txt", sep = "\t", row.names = 1)
+
+source("D:/Kerguelen_project/analysis_with_R/Rscripts/diaganostic_pigments.R", encoding = "UTF-8")
+pigm_plot(pigments,diag_pigm)
+```
+
+
+## **GENOMIC ANALYSES**
+
+
+
+#### data transformation clr and hellinger
+
+to account for compositionality of sequencing data, data needs to be normalized. Most robust is centered-log-ratio transformation, however, it gives negative values and thus, hellinger is better for some analyses.
+
+We choose 3 as the appropriate row-sum cutoff to exclude low abundant ASVs.
+```{r transformations}
+source("C:/Users/choerstm/Documents/core_PS113/Genomics/RScripts/general_clr_hellinger_transformation.R", encoding = "UTF-8")
+ASV_16S_hellinger <- hellinger(ASV_16S,3)
+ASV_18S_hellinger <- hellinger(ASV_18S,3)
+ASV_16S_clr <- clr(ASV_16S,3)
+ASV_18S_clr <- clr(ASV_18S,3)
+#it'll print the number of removed rows for 16S and 18S, respectively
+```
+#### metadata z-scoring
+
+z scoring unifies metadata by shifting the mean of all variables to 0 and the standard deviation to 1.
+
+```{r zscore}
+meta_16S.z <- meta_16S
+meta_18S.z <- meta_18S
+meta_16S.z[c(5:15,17, 21, 24,28,30, 31)] <- lapply(meta_16S.z[c(5:15,17, 21, 24,28,30, 31)], function(x) {y <-scale(x, center = TRUE, scale = TRUE)})
+meta_18S.z[c(5:15,17, 21, 24,28,30, 31)] <- lapply(meta_18S.z[c(5:15,17, 21, 24,28,30, 31)], function(x) {y <-scale(x, center = TRUE, scale = TRUE)})
+
+rownames(meta_16S.z) <- meta_16S.z$Event
+rownames(meta_18S.z) <- meta_18S.z$Event
+```
+
+## **diversity calculations**
+
+iNEXT focuses on three measures of Hill numbers of order q: species richness (q = 0), Shannon diversity (q = 1, the exponential of Shannon entropy) and Simpson diversity (q = 2, the inverse of Simpson concentration). For each diversity measure, iNEXT uses the observed sample of abundance or incidence data (called the “reference sample”) to compute diversity estimates and the associated 95% confidence intervals for the following two types of rarefaction and extrapolation (R/E):
+
+1. Sample‐size‐based R/E sampling curves: iNEXT computes diversity estimates for rarefied and extrapolated samples up     to an appropriate size. This type of sampling curve plots the diversity estimates with respect to sample size.
+
+2. Coverage‐based R/E sampling curves: iNEXT computes diversity estimates for rarefied and extrapolated samples with      sample completeness (as measured by sample coverage) up to an appropriate coverage. This type of sampling curve        plots the diversity estimates with respect to sample coverage.
+
+iNEXT also plots the above two types of sampling curves and a sample completeness curve. The sample completeness curve provides a bridge between these two types of curves.
+
+(Fig. A6)
+
+```{r div,echo=FALSE, message=FALSE, warning=FALSE, fig.show="hold", out.width="50%", results='hide'}
+source("C:/Users/choerstm/Documents/core_PS113/Genomics/RScripts/iNEXT_diversity_general.R", encoding = "UTF-8")
+div_16S <- diversity_iNEXT(ASV_16S)
+div_18S <- diversity_iNEXT(ASV_18S)
+
+#print the rarefaction curves (be careful this is quite memory intensive)
+diversity_iNEXT_plots(ASV_16S)
+diversity_iNEXT_plots(ASV_18S)
+
+#attach to metadata
+meta_16S$Site <- meta_16S$Event
+meta.16S.div <- left_join(meta_16S, div_16S, by = "Site")
+rownames(meta.16S.div) <- meta.16S.div$Event
+
+
+meta_18S$Site <- meta_18S$Event
+meta.18S.div <- left_join(meta_18S, div_18S, by = "Site")
+rownames(meta.18S.div) <- meta.18S.div$Event
+
+```
+
+
+### **correlation analyses**
+
+A key objective of this study was to investigate correlations between microbial diversity (reflected in richness q=0 and Inverse Simpson q=2, the latter to better reflect taxonomic evenness across a sample). 
+
+(Fig. A7, A8)
+```{r cor, echo = FALSE, warning=FALSE, fig.width=7,fig.height=3.5,fig.show="hold", out.width="50%"}
+source("D:/Kerguelen_project/analysis_with_R/Rscripts/correlations_diversity.R", encoding = "UTF-8")
+corr_plots(meta.16S.div, meta.18S.div)
+
+```
+
+
+#### gdm (general dissimilarity model)
+
+another way of analysing the effect of environmental dissmilarity on microbial community dissimilarity is using a general dissimilarity model, since it is more flexible to non-linear effects.
+
+(Fig. 4 c,d; Fig. 11)
+
+```{r gdm}
+source("D:/Kerguelen_project/analysis_with_R/Rscripts/gdm_environmental_distance.R", encoding = "UTF-8")
+#decide input metadata for gdm analysis
+gdm_input <- c("Event","Latitude","Longitude","Sal", "MLD..m.", "Temp", "oxygen", "NO3umol.l", "NH4_umol.l", "P_umol.l", "Si_umol.l", "chl.a_ug.l", "POCPN_ratio", "mean_c.fix", "mean_PB", "mean_N2fix")
+print("prokaryotes")
+gdm_analysis(ASV_16S_hellinger, meta_16S.z[gdm_input])
+print("eukaryotes")
+gdm_analysis(ASV_18S_hellinger, meta_18S.z[gdm_input])
+```
+
+### **multivariate analysis**
+
+RDA and PERMANOVA test
+
+We perfromed PCA analyses on metadata and excluded data which were correlating with other variables. 
+Input variables are listed uder "RDA input"
+We checked whether residulas of metadata were normally distributed and used the ones for further analysis in RDA
+
+Significances of differences were tested using PERMANOVA
+
+(Fig. 4 a,b; Fig. A9)
+
+```{r RDA_proks, fig.show="hold", out.width="50%", fig.width=6,fig.height=5.5}
+source("D:/Kerguelen_project/analysis_with_R/Rscripts/actual_multivariate_test.R", encoding = "UTF-8")
+
+RDA_input <- c("Event","Temp","oxygen", "NO3umol.l", "NH4_umol.l","Si_umol.l", "chl.a_ug.l","mean_c.fix", "mean_N2fix")
+
+RDA_analysis(ASV_16S_clr, ASV_16S_hellinger, meta_16S.z, meta_16S.z[RDA_input])
+
+
+```
+```{r rda_euks, fig.show="hold", out.width="50%", fig.width=6,fig.height=5.5}
+RDA_analysis(ASV_18S_clr, ASV_18S_hellinger, meta_18S.z, meta_18S.z[RDA_input])
+```
+
+### **upset plots**
+
+alternative to venn diagram but gives more information through set size and intersection size. Yet, it is only a vague estimate in our analysis, since provinces represent sum of all ASVs detected across samples but not neccessarily occur in other samples. Thus, upset plots should only be performed when differences between provinces were significant (in PERMANOVA) How well each sample fit the sum of its province is summarised below
+
+Reference: https://jokergoo.github.io/ComplexHeatmap-reference/book/upset-plot.html
+
+(Fig. 4 e,f)
+```{r upset, fig.show="hold", out.width="50%", fig.width=7,fig.height=3.5}
+source("D:/Kerguelen_project/analysis_with_R/Rscripts/upsetR.R", encoding = "UTF-8")
+upset_16Splots(ASV_16S)
+upset_18Splots(ASV_18S)
+```
+
+
+**Table A5**
+
+because it is biased you can check how well each sample is represented in the combined sample. You can only use this analysis if the PERMANOVA is actually significant
+
+for the analysis I choose union mode: 1 means in that set and 0 is not taken into account. 
+When there are multiple 1, the relationship is OR. Then, 1 1 0 means a set of elements in set A or B, 
+and they can also in C or not in C (union(A, B)). Under this mode, the seven combination sets can overlap.
+
+##### 16S
+
+**SO**
+S37 -   0   1   2 
+       520 237 218 - "of total presence (455) : 48%
+S11 -   0   1   2 
+       520 237 218 - "of total presence (455) : 48%
+SE -   0   1   2 
+       520 202 253 - "of total presence (455) : 56%
+S7 -   0   1   2 
+       520 214 241 - "of total presence (455) : 53%
+S9 -   0   1   2 
+       520 228 227 - "of total presence (455) : 50%
+S10 -   0   1   2 
+       520 201 254 - "of total presence (455) : 56%
+
+**SSTC**
+S4 -   0   1   2 
+       456 218 301 - "of total presence (519) : 58%
+S14 -   0   1   2 
+       456 200 319 - "of total presence (519) : 61%
+S15 -   0   1   2 
+       456 184 335 - "of total presence (519) : 65%
+
+**ISSG**
+S3 -   0   1   2 
+       418 188 369 - "of total presence (557) : 66%
+S2 -   0   1   2 
+       418 295 262 - "of total presence (557) : 47%
+S18 -   0   1   2 
+       418 254 303 - "of total presence (557) : 54%
+
+
+##### 18S
+
+**SO**
+S37 -   0   1   2 
+       1923 439 139 - "of total presence (578) : 24%
+S11 -   0   1   2 
+       1923 342 236 - "of total presence (578) : 41%
+SE -   0   1   2 
+       1923 216 362 - "of total presence (578) : 63%
+S7 -   0   1   2 
+       1923 275 303 - "of total presence (578) : 52%
+S9 -   0   1   2 
+       1923 229 349 - "of total presence (578) : 60%
+
+**SSTC**
+S4 -   0   1   2 
+       1917 263 321 - "of total presence (584) : 55%
+S15 -   0   1   2 
+       1917 145 439 - "of total presence (584) : 75%
+
+**ISSG**
+S3 -   0   1   2 
+       586 852 1063 - "of total presence (1915) : 56%
+S2 -   0   1   2 
+       586 1031 884 - "of total presence (1915) : 46%
+S16 -   0   1   2 
+       586 1325 590 - "of total presence (1915) : 31%
+S18 -   0   1   2 
+       586 1002 913 - "of total presence (1915) : 48%
+
+
+### **SIMPER**
+
+when differences between provinces are significant it is valid to perform a SIMilarity PERcentage (SIMPER) analysis to see which entities contribute most to the observed dissimilarity (Clarke 1993)
+
+```{r simper, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+#for input water masses need to be numeric
+source("D:/Kerguelen_project/analysis_with_R/Rscripts/SIMPER_analysis_1.R")
+print("SIMPER analysis 16S", quote = F)
+SIMPER(ASV_16S_clr, meta_16S.z, taxonomy_16S)
+print("SIMPER analysis 18S", quote = F)
+SIMPER(ASV_18S_clr, meta_18S.z, taxonomy_18S)
+```
+```{r taxonomy, echo=FALSE, message=FALSE, warning=FALSE}
+source("D:/Kerguelen_project/analysis_with_R/Rscripts/clr_taxonomy_analysis.R")
+```
+
+
+
+
+
+
+
+
