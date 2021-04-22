@@ -16,7 +16,7 @@ Nutrient_p <- function(Carbonfix, POCPN){
 a <- Carbonfix%>%
   ggplot(aes(x = Temp, y = NO3umol.l, col = WM))+
   geom_point(aes(fill = WM), alpha=8/10, shape=21, colour="black", size=5)+
-  scale_fill_manual(values=c("#F6A316","#73B3E3","#0C649A","#107734", "#6CB52D")) +
+  scale_fill_manual(values=c("#6CB52D","#F6A316","#107734", "#0C649A", "#73B3E3")) +
   labs(x = "SST [°C]", y = "Nitrate conc. [umol L-1]")+
   theme(axis.title.x = element_text(size=16, vjust = 0.3),
         axis.title.y = element_text(size=16, vjust = 0.3),
@@ -31,7 +31,7 @@ print(a)
 b <- Carbonfix%>%
   ggplot(aes(x = Temp, y = P_umol.l, col = WM))+
   geom_point(aes(fill = WM), alpha=8/10, shape=21, colour="black", size=5)+
-  scale_fill_manual(values=c("#F6A316","#73B3E3","#0C649A","#107734", "#6CB52D")) +
+  scale_fill_manual(values=c("#6CB52D","#F6A316","#107734", "#0C649A", "#73B3E3")) +
   labs(x = "SST [°C]", y = "Phosphate conc. [umol L-1]")+
   theme(axis.title.x = element_text(size=16, vjust = 0.3),
         axis.title.y = element_text(size=16, vjust = 0.3),
@@ -46,7 +46,7 @@ print(b)
 c <- Carbonfix%>%
   ggplot(aes(x = Temp, y = Si_umol.l, col = WM))+
   geom_point(aes(fill = WM), alpha=8/10, shape=21, colour="black", size=5)+
-  scale_fill_manual(values=c("#F6A316","#73B3E3","#0C649A","#107734", "#6CB52D")) +
+  scale_fill_manual(values=c("#6CB52D","#F6A316","#107734", "#0C649A", "#73B3E3")) +
   labs(x = "SST [°C]", y = "Silicate conc. [umol L-1]")+
   theme(axis.title.x = element_text(size=16, vjust = 0.3),
         axis.title.y = element_text(size=16, vjust = 0.3),
@@ -91,7 +91,7 @@ print(Cfix_SO%>%group_by(Event)%>%summarise(mean_NO3 = mean(NO3umol.l, na.rm = T
 d <- POCPN%>%
   ggplot(aes(x = Temp, y = POCPN_ratio, col = WM))+
   geom_point(aes(fill = WM), alpha=8/10, shape=21, colour="black", size=5)+
-  scale_fill_manual(values=c("#F6A316","#73B3E3","#0C649A","#107734", "#6CB52D")) +
+  scale_fill_manual(values=c("#6CB52D","#F6A316","#107734", "#0C649A", "#73B3E3")) +
   labs(x = "SST [°C]", y = "POCPN molar ratio")+
   theme(axis.title.x = element_text(size=16, vjust = 0.3),
         axis.title.y = element_text(size=16, vjust = 0.3),

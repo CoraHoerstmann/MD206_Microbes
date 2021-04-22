@@ -14,7 +14,7 @@ packageVersion("ggplot2")
 a <- POCPN_data%>%
   ggplot(aes(x = Temp, y = PN_CHL, col = WM))+
   geom_point(aes(fill = WM), alpha=8/10, shape=21, colour="black", size=5)+
-  scale_fill_manual(values=c("#F6A316","#73B3E3","#0C649A","#107734", "#6CB52D")) +
+  scale_fill_manual(values=c("#6CB52D","#F6A316","#107734", "#0C649A", "#73B3E3")) +
   labs(x = "SST [°C]", y = "PN : chl.a ratio")+
   theme(axis.title.x = element_text(size=16, vjust = 0.3),
         axis.title.y = element_text(size=16, vjust = 0.3),
@@ -29,7 +29,7 @@ print(a)
 b <- N2fix_data%>%
   ggplot(aes(x = Temp, y = delta_15N, col = WM))+
   geom_point(aes(fill = WM), alpha=8/10, shape=21, colour="black", size=5)+
-  scale_fill_manual(values=c("#F6A316","#73B3E3","#0C649A","#107734", "#6CB52D")) +
+  scale_fill_manual(values=c("#6CB52D","#F6A316","#107734", "#0C649A", "#73B3E3")) +
   labs(x = "SST [°C]", y = "delta 15N")+
   theme(axis.title.x = element_text(size=16, vjust = 0.3),
         axis.title.y = element_text(size=16, vjust = 0.3),
