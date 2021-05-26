@@ -100,9 +100,7 @@ PB is mainly a function of irradiance but can also sometimes be used to check ph
 N2 fixation, normalized by chlorophyll a, gives insights about the relative importance of N2 fixation to primary productivity. As seen in our data, although we were able to measure N2 fixation throughout the entire sampling region, the relative importance of N2 fixation to PP in the Southern Ocean (SO) is low because other N sources (nitrate) are available and PP is >> N2 fixation.
 
 ```{r phytoplankton biomass normalization, echo=TRUE}
-
 Carbonfix$PB <- Carbonfix$cfix.day/Carbonfix$chl.a_ug.l
-
 ```
 
 #### plot rates against sea surface temperature 
@@ -144,7 +142,6 @@ Size classes had a significant second order polynominal fit.
 
 ```{r pigm, fig.width=7,fig.height=3.5, echo=FALSE, warning=FALSE}
 diag_pigm <- read.csv("D:/Kerguelen_project/analysis_with_R/Rscripts/Submission_analysis/diag_pigm_mg_m3_t0_nosize.txt", sep = "\t", row.names = 1)
-
 source("D:/Kerguelen_project/analysis_with_R/Rscripts/diaganostic_pigments.R", encoding = "UTF-8")
 pigm_plot(pigments,diag_pigm)
 ```
@@ -176,7 +173,6 @@ meta_16S.z <- meta_16S
 meta_18S.z <- meta_18S
 meta_16S.z[c(5:15,17, 21, 24,28,30, 31)] <- lapply(meta_16S.z[c(5:15,17, 21, 24,28,30, 31)], function(x) {y <-scale(x, center = TRUE, scale = TRUE)})
 meta_18S.z[c(5:15,17, 21, 24,28,30, 31)] <- lapply(meta_18S.z[c(5:15,17, 21, 24,28,30, 31)], function(x) {y <-scale(x, center = TRUE, scale = TRUE)})
-
 rownames(meta_16S.z) <- meta_16S.z$Event
 rownames(meta_18S.z) <- meta_18S.z$Event
 ```
@@ -197,21 +193,16 @@ iNEXT also plots the above two types of sampling curves and a sample completenes
 source("C:/Users/choerstm/Documents/core_PS113/Genomics/RScripts/iNEXT_diversity_general.R", encoding = "UTF-8")
 div_16S <- diversity_iNEXT(ASV_16S)
 div_18S <- diversity_iNEXT(ASV_18S)
-
 #print the rarefaction curves (be careful this is quite memory intensive)
 diversity_iNEXT_plots(ASV_16S)
 diversity_iNEXT_plots(ASV_18S)
-
 #attach to metadata
 meta_16S$Site <- meta_16S$Event
 meta.16S.div <- left_join(meta_16S, div_16S, by = "Site")
 rownames(meta.16S.div) <- meta.16S.div$Event
-
-
 meta_18S$Site <- meta_18S$Event
 meta.18S.div <- left_join(meta_18S, div_18S, by = "Site")
 rownames(meta.18S.div) <- meta.18S.div$Event
-
 ```
 
 
@@ -223,7 +214,6 @@ A key objective of this study was to investigate correlations between microbial 
 ```{r cor, echo = FALSE, warning=FALSE, fig.width=7,fig.height=3.5,fig.show="hold", out.width="50%"}
 source("D:/Kerguelen_project/analysis_with_R/Rscripts/correlations_diversity.R", encoding = "UTF-8")
 corr_plots(meta.16S.div, meta.18S.div)
-
 ```
 
 
@@ -238,9 +228,9 @@ source("D:/Kerguelen_project/analysis_with_R/Rscripts/gdm_environmental_distance
 #decide input metadata for gdm analysis
 gdm_input <- c("Event","Latitude","Longitude","Sal", "MLD..m.", "Temp", "oxygen", "NO3umol.l", "NH4_umol.l", "P_umol.l", "Si_umol.l", "chl.a_ug.l", "POCPN_ratio", "mean_c.fix", "mean_PB", "mean_N2fix")
 print("prokaryotes")
-gdm_analysis(ASV_16S_hellinger, meta_16S.z[gdm_input])
+gdm_analysis(ASV_16S_hellinger, meta_16S[gdm_input])
 print("eukaryotes")
-gdm_analysis(ASV_18S_hellinger, meta_18S.z[gdm_input])
+gdm_analysis(ASV_18S_hellinger, meta_18S[gdm_input])
 ```
 
 ### **multivariate analysis**
@@ -257,12 +247,8 @@ Significances of differences were tested using PERMANOVA
 
 ```{r RDA_proks, fig.show="hold", out.width="50%", fig.width=6,fig.height=5.5}
 source("D:/Kerguelen_project/analysis_with_R/Rscripts/actual_multivariate_test.R", encoding = "UTF-8")
-
 RDA_input <- c("Event","Temp","oxygen", "NO3umol.l", "NH4_umol.l","Si_umol.l", "chl.a_ug.l","mean_c.fix", "mean_N2fix")
-
 RDA_analysis(ASV_16S_clr, ASV_16S_hellinger, meta_16S.z, meta_16S.z[RDA_input])
-
-
 ```
 ```{r rda_euks, fig.show="hold", out.width="50%", fig.width=6,fig.height=5.5}
 RDA_analysis(ASV_18S_clr, ASV_18S_hellinger, meta_18S.z, meta_18S.z[RDA_input])
@@ -369,11 +355,5 @@ SIMPER(ASV_18S_clr, meta_18S.z, taxonomy_18S)
 ```{r taxonomy, echo=FALSE, message=FALSE, warning=FALSE}
 source("D:/Kerguelen_project/analysis_with_R/Rscripts/clr_taxonomy_analysis.R")
 ```
-
-
-
-
-
-
 
 
