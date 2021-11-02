@@ -30,7 +30,7 @@ print(str(gdm.1))
 
 length(gdm.1$predictors) # get idea of number of panels
 
-plot(gdm.1, plot.layout=c(2,2))
+plot(gdm.1, plot.layout=c(2,5))
 
 gdm.1.splineDat <- isplineExtract(gdm.1)
 str(gdm.1.splineDat)
@@ -54,7 +54,7 @@ max(gdm.1.splineDat$y[,"oxygen"])
 max(gdm.1.splineDat$y[,"MLD..m."])
 max(gdm.1.splineDat$y[,"P_umol.l"])
 max(gdm.1.splineDat$y[,"Si_umol.l"])
-max(gdm.1.splineDat$y[,"chl.a_ug.l"])
+max(gdm.1.splineDat$y[,"chl.a"])
 max(gdm.1.splineDat$y[,"POCPN_ratio"])
 max(gdm.1.splineDat$y[,"mean_c.fix"])
 max(gdm.1.splineDat$y[,"mean_PB"])

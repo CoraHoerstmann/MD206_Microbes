@@ -12,7 +12,7 @@ packageVersion("ggplot2")
 
 ##PN.chla
 a <- POCPN_data%>%
-  ggplot(aes(x = Temp, y = PN_CHL, col = WM))+
+  ggplot(aes(x = Temperature, y = PN_CHL, col = WM))+
   geom_point(aes(fill = WM), alpha=8/10, shape=21, colour="black", size=5)+
   scale_fill_manual(values=c("#6CB52D","#F6A316","#107734", "#0C649A", "#73B3E3")) +
   labs(x = "SST [°C]", y = "PN : chl.a ratio")+
@@ -44,7 +44,7 @@ print(b)
 
 
 PN <- POCPN_data%>%filter(Timeslice..sampling.time. == "T0")
-print(PN[c(1,18:20)])
+print(PN[c(1,17:19)])
 
 ##delta15N differences between watermasses
 

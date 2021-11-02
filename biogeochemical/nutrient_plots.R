@@ -89,7 +89,7 @@ print(Cfix_SO%>%group_by(Event)%>%summarise(mean_NO3 = mean(NO3umol.l, na.rm = T
 ##POC
 
 d <- POCPN%>%
-  ggplot(aes(x = Temp, y = POCPN_ratio, col = WM))+
+  ggplot(aes(x = Temperature, y = POCPN_ratio, col = WM))+
   geom_point(aes(fill = WM), alpha=8/10, shape=21, colour="black", size=5)+
   scale_fill_manual(values=c("#6CB52D","#F6A316","#107734", "#0C649A", "#73B3E3")) +
   labs(x = "SST [°C]", y = "POCPN molar ratio")+

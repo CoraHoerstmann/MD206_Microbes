@@ -21,7 +21,7 @@ meta_N <- N2fix%>%
 
 meta_P <- POCPN%>%filter(Timeslice..sampling.time. == "T0")
 
-meta_X <- left_join(meta_s[c(1:20,26:29)], meta_P[c(1,14:16)], by = "Event")  
+meta_X <- left_join(meta_s[c(1:19,25:29)], meta_P[c(1,14:16)], by = "Event")  
 meta_X <- left_join(meta_X, meta_C,  by = "Event")
 meta_X <- left_join(meta_X, meta_PB, by = "Event")
 meta_X <- left_join(meta_X, meta_N, by = "Event")
@@ -67,3 +67,4 @@ print(meta_X%>%
 
 #clean up!
 rm(meta_C, meta_N, meta_P, meta_PB, meta_s)
+

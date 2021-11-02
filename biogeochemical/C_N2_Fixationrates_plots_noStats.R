@@ -142,9 +142,9 @@ print(Nfix%>%
   summarise(MQR_station = mean(MQR, na.rm = TRUE), mean_N2.fix = mean(N2.fix..nmol.l.day., na.rm = TRUE), min = min(N2.fix..nmol.l.day., na.rm = TRUE), max = max(N2.fix..nmol.l.day., na.rm = TRUE), n = n(), na.rm = TRUE))
 
 meta_s <- Nfix%>%dplyr::filter(Replicate == "1" & Incubation == "bin1")
-Nfix_all <- inner_join(Nfix_all, Cfix[c(1:15,27,28)], by = "Event")
+Nfix_all <- inner_join(Nfix_all, Cfix[c(1:15,26:29)], by = "Event")
 Cfix$Incubation <- Cfix$Method.comm..incubation.bin.
-Nfix_n <- left_join(Nfix, Cfix[c(1:15, 22, 30)], by = c("Event", "Incubation", "Replicate"))
+Nfix_n <- left_join(Nfix, Cfix[c(1:15, 21,30)], by = c("Event", "Incubation", "Replicate"))
 print(Nfix_all%>%
         group_by(WM)%>%
         summarise(mean = mean(mean_N2.fix), min = min(mean_N2.fix), max = max(mean_N2.fix), n = n()))  
